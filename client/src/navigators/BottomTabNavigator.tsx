@@ -11,11 +11,31 @@ function BottomTabNavigator() {
   const BottomTab = createBottomTabNavigator();
   return (
     <BottomTab.Navigator initialRouteName="Home">
-      <BottomTab.Screen name="Home" component={HomeScreen} />
-      <BottomTab.Screen name="Category" component={CategoryScreen} />
-      <BottomTab.Screen name="Map" component={MapScreen} />
-      <BottomTab.Screen name="Calendar" component={CalendarScreen} />
-      <BottomTab.Screen name="MyPage" component={MyPageScreen} />
+      <BottomTab.Screen
+        options={{headerShown: false}}
+        name="Home"
+        component={HomeScreen}
+      />
+      <BottomTab.Screen
+        options={{headerShown: false}}
+        name="Category"
+        component={CategoryScreen}
+      />
+      <BottomTab.Screen
+        options={{headerShown: false}}
+        name="Map"
+        component={MapScreen}
+      />
+      <BottomTab.Screen
+        options={{headerShown: false}}
+        name="Calendar"
+        component={CalendarScreen}
+      />
+      <BottomTab.Screen
+        options={{headerShown: false}}
+        name="MyPage"
+        component={MyPageScreen}
+      />
     </BottomTab.Navigator>
   );
 }
