@@ -16,7 +16,7 @@ mock.onPost('http://localhost:8080/api/auth/authenticate').reply(200, 'eyJhbGciO
 mock.onPost('http://localhost:8080/api/signup').reply(200, {
     "id": 1,
     "userId": "yjw",
-    "userName": "윤진원",
+    "userName": "yoonjinwon",
     "status": null,
     "email": "loveyjw78@gmail.com",
     "token": null,
