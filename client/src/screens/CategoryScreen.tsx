@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
-import {View, Text, FlatList, TouchableOpacity, Modal} from 'react-native';
+import {View, Text, FlatList, TouchableOpacity, Modal, SafeAreaView} from 'react-native';
 import PopUpStoreSummaryComponent from '../components/PopUpStoreSummaryComponent';
 import CategoryFilterModal from '../components/CategoryFilterModal';
 import SearchBar from '../components/SearchBar';
 import styled from '@emotion/native';
 
-const Container = styled.View`
+const Container = styled.SafeAreaView`
   flex: 1;
   align-items: center;
   padding-top: 10px; // 검색바 위쪽에 마진 추가
