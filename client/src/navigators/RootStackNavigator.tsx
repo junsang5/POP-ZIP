@@ -15,11 +15,11 @@ function RootStackNavigator() {
   const isLoggedIn = user != null;
   const Stack = createNativeStackNavigator();
   useEffect(() => {
-    console.log('user: ', user);
+    console.log('Redux auth.user: ', user);
     console.log('isLoggedIn: ', isLoggedIn);
     const fetchUserFromStorage = async () => {
-      const u = await AsyncStorage.getItem('user');
-      console.log('Storage user: ', u);
+      const u = await AsyncStorage.getItem('userId');
+      console.log('AsyncStorage userId: ', u);
     };
     fetchUserFromStorage();
   }, [user]);

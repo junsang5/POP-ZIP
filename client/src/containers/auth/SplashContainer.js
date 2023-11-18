@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { checkUserLogin } from '../../redux/auth/authSlice';
+import { getUserInfo } from '../../redux/auth/authSlice';
 import Splash from '../../components/Splash';
 import { setUser } from '../../redux/auth/authSlice';
 
@@ -10,15 +10,13 @@ function SplashContainer({ navigation }) {
   useEffect(() => {
     // 3초 지연 후에 로그인 상태 확인
     const timer = setTimeout(() => {
-      dispatch(checkUserLogin()).unwrap()
-        .then((user) => { // fulfilled
-          console.log('checkUserLogin: user=', user);
-          dispatch(setUser(user));
+      dispatch(getUserInfo()).unwrap()
+        .then((user) => { // fulfilled (user = {userId, userName, age})
+          console.log('Splash getUserInfo: user => ', user);
           navigation.replace('Root');
         })
         .catch((error) => { // rejected
-          console.error(error);
-          dispatch(setUser(null));
+          console.error('Splash getUserInfo Error: ', error);
           navigation.replace('SignIn');
         });
     }, 3000);
