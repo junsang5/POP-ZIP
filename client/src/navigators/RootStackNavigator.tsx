@@ -9,6 +9,7 @@ import BottomTabNavigator from './BottomTabNavigator';
 import SplashScreen from '../screens/SplashScreen';
 import SearchScreen from '../screens/SearchScreen';
 import ProfileChangeScreen from '../screens/ProfileChangeScreen';
+import StoreScreen from '../screens/StoreScreen';
 
 function RootStackNavigator() {
   const user = useSelector(state => state.auth.user);
@@ -26,6 +27,7 @@ function RootStackNavigator() {
   return (
     <Stack.Navigator initialRouteName={isLoggedIn ? 'Root' : 'Splash'}>
       <Stack.Screen name="Splash" component={SplashScreen} />
+      <Stack.Screen name="Store" component={StoreScreen} />
       <Stack.Screen name="Search" component={SearchScreen} />
       <Stack.Screen name="ProfileChange" component={ProfileChangeScreen} />
       {isLoggedIn === false && (

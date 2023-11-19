@@ -1,8 +1,8 @@
 import React from 'react';
-import {View, Text} from 'react-native';
+import {Pressable, Text} from 'react-native';
 import styled from '@emotion/native';
 
-const Container = styled.View`
+const Container = styled.Pressable`
   display: flex;
   // width: 80%;
   width: 340px;
@@ -12,10 +12,13 @@ const Container = styled.View`
   border-radius: 24px;
 `;
 
-const PopUpStoreSummaryComponent = ({data}) => {
+const PopUpStoreSummaryComponent = ({onPress, data}) => {
+  const {id, name, brand, address, category, startDate, endDate} = data;
   return (
-    <Container>
-      <Text>{data.name}</Text>
+    <Container onPress={onPress}>
+      <Text>{name}</Text>
+      <Text>{brand}</Text>
+      <Text>{address}</Text>
     </Container>
   );
 };

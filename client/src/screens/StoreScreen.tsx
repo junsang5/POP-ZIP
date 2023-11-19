@@ -79,58 +79,49 @@ const DetailBody = styled.Text`
   line-height: 24px;
 `;
 
-function StoreScreen() {
+function StoreScreen({route}) {
+  const {popup} = route.params;
   return (
     <SafeAreaView>
       <ScrollView>
         <PopupImage
           source={{
-            uri: 'https://k.kakaocdn.net/dn/OgWSd/btsvoWU2HOn/TybFyU1PsqperlcIAOxZu0/img_640x640.jpg',
+            uri: popup.image,
           }}
         />
-        <PopupName>AIR JORDAN: The Shot</PopupName>
+        <PopupName>{popup.name}</PopupName>
         <LogoContainer>
           <LogoImage
             source={{
-              uri: 'https://k.kakaocdn.net/dn/OgWSd/btsvoWU2HOn/TybFyU1PsqperlcIAOxZu0/img_640x640.jpg',
+              uri: popup.brandLogo, // brandLogo는 popup 객체 내에 있는 브랜드 로고 URL입니다.
             }}
           />
-          <LogoText>AIR JORDAN</LogoText>
+          <LogoText>{popup.brand}</LogoText>
         </LogoContainer>
 
         <InfoContainer>
           <InfoItem
             iconUri="https://www.figma.com/file/sZT3d2ToaiqERKIo13agU5/Untitled?type=design&node-id=378-460&mode=dev"
-            text="서울 종로구 갤러리 12-34"
+            text={popup.address}
           />
           <InfoItem
             iconUri="http://example.com/calendar-icon.png"
-            text="2023.09.14~2023.09.30"
+            text={`${popup.startDate}~${popup.endDate}`}
           />
           <InfoItem
             iconUri="http://example.com/type-icon.png"
-            text="실내/스튜디오"
+            text={popup.category}
           />
+          {/* 운영시간은 제외한다고 했으므로 이 부분은 주석 처리하거나 삭제합니다.
           <InfoItem
             iconUri="http://example.com/type-icon.png"
-            text="운영시간: 월~금, 09:00~18:00, 주말 휴무"
+            text="운영시간 정보"
           />
+          */}
         </InfoContainer>
         <DetailContainer>
           <DetailTitle>상세</DetailTitle>
-          <DetailBody>
-            서울 중구 롯데백화점 본점 지하 1층, 개장 전부터 '소버 유니온'
-            팝업스토어 앞에 고객들이 모여들더니 어느새 긴 줄이 생겼다. 화려한
-            색감의 빈티지 잡지를 한 장 한 장 모아 빼곡하게 채운 바닥이 눈길을
-            끄는 이번 팝업스토어는 롯데백화점과 '레트로 감성'을 담은 스트리트
-            컬쳐 브랜드 소버 유니온의 협업을 통해 탄생한 공간이다. 지난 14일
-            롯데백화점이 문을 열고 오는 20일까지 '스트리트 컬쳐'를 테마로 한
-            유통업계 최대 규모의 빈티지 팝업 스토어를 선보이는 매장을 직접
-            가봤다. '스니커즈 언박스드 서울'과 연계한 이번 팝업스토어는
-            1970~1980년대 '스트리트 컬쳐'를 낯설고 또 힙(hip)하게 받아들이는 MZ
-            세대를 겨냥해 꾸며진 공간이다. 당시 스트리트 감성을 고스란히 느낄 수
-            있는 각종 빈티지 의류와 소품을 한자리에서 만나볼 수 있다.
-          </DetailBody>
+          <DetailBody>{popup.description}</DetailBody>
         </DetailContainer>
       </ScrollView>
     </SafeAreaView>

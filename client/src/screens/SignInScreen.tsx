@@ -39,6 +39,7 @@ function SignInScreen({navigation}) {
               error,
             );
             alert('getUserInfo: 사용자 정보를 가져오는 데 실패하였습니다.');
+            navigation.navigate('SignIn');
           });
       })
       .catch((error: any) => {

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -6,11 +6,11 @@ import {
   ScrollView,
   SafeAreaView,
   Modal,
+  Pressable,
   TouchableWithoutFeedback,
 } from 'react-native';
 import styled from 'styled-components/native';
-
-// 스타일드 컴포넌트 정의
+import {useSelector} from 'react-redux';
 
 const Header = styled(View)`
   flex-direction: row;
@@ -54,13 +54,18 @@ const HomeSubTitle = styled(Text)`
   color: grey;
 `;
 
-const HomeItem = ({titleText, subText, imageUri}) => (
-  <Column>
-    <HomeTitle>{titleText}</HomeTitle>
-    <HomeSubTitle>{subText}</HomeSubTitle>
-    <HomeImage source={{uri: imageUri}} />
-  </Column>
-);
+const HomeItem = ({handlePressImg, titleText, subText, imageUri}) => {
+  // subText = {팝업스토어 title}, imageUri = {팝업스토어 img}
+  return (
+    <Column>
+      <HomeTitle>{titleText}</HomeTitle>
+      <HomeSubTitle>{subText}</HomeSubTitle>
+      <Pressable onPress={handlePressImg}>
+        <HomeImage source={{uri: imageUri}} />
+      </Pressable>
+    </Column>
+  );
+};
 
 // 카드 스타일 컴포넌트
 const Card = styled.View`
@@ -85,10 +90,51 @@ const Container = styled.View`
   background-color: rgba(240, 248, 255, 0.3);
 `;
 
-// 메인 컴포넌트
-const HomeScreen = () => {
-  const [modalVisible, setModalVisible] = useState(false);
+const getCurrentDate = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = (today.getMonth() + 1).toString().padStart(2, '0'); // month -> 2자리
+  const date = today.getDate().toString().padStart(2, '0'); // date -> 2자리
 
+  const formattedDate = `${year}-${month}-${date}`;
+  console.log('today is ', formattedDate);
+  return formattedDate;
+};
+
+const HomeScreen = ({navigation}) => {
+  const [homePopups, setHomePopups] = useState([]);
+  const [todayStartPopups, setTodayStartPopups] = useState([]);
+  const [todayEndPopups, setTodayEndPopups] = useState([]);
+
+  const popUpStores = useSelector(state => state.popups);
+  const userName = useSelector(state => state.auth.user.userName);
+
+  useEffect(() => {
+    const currentDate = getCurrentDate();
+
+    // view_home이 true인 팝업스토어만 필터링
+    const filteredHomePopups = popUpStores
+      .filter(popup => popup.viewHome === true)
+      .slice(0, 3); // 최대 3개
+
+    // start_date가 오늘인 팝업스토어만 필터링
+    const filteredTodayStartPopups = popUpStores
+      .filter(popup => popup.startDate === currentDate)
+      .slice(0, 3); // 최대 3개
+
+    // end_date가 오늘인 팝업스토어만 필터링
+    const filteredTodayEndPopups = popUpStores
+      .filter(popup => popup.endDate === currentDate)
+      .slice(0, 3); // 최대 3개
+
+    setHomePopups(filteredHomePopups);
+    setTodayStartPopups(filteredTodayStartPopups);
+    setTodayEndPopups(filteredTodayEndPopups);
+  }, [popUpStores]);
+
+  const handlePressImg = store => {
+    navigation.navigate('Store', {popup: store});
+  };
   return (
     <SafeAreaView>
       <Header>
@@ -98,68 +144,35 @@ const HomeScreen = () => {
             uri: 'https://k.kakaocdn.net/dn/OgWSd/btsvoWU2HOn/TybFyU1PsqperlcIAOxZu0/img_640x640.jpg',
           }}
         />
-
-        {/* 이미지를 TouchableWithoutFeedback으로 감싸서 클릭 이벤트 처리 */}
-        <TouchIcon onPress={() => setModalVisible(true)}>
-          <Icon
-            source={{
-              uri: 'https://k.kakaocdn.net/dn/OgWSd/btsvoWU2HOn/TybFyU1PsqperlcIAOxZu0/img_640x640.jpg',
-            }}
-          />
-        </TouchIcon>
       </Header>
-
-      {/* 이미지를 클릭했을 때 나타나는 모달 추가 */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}>
-        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            {/* 아래에 모달을 클릭할 떄 띄울 것 */}
-            <ScrollView style={{maxHeight: '80%'}}>
-              <TouchableWithoutFeedback>
-                <Container>
-                  <Card>
-                    <CardText>헤더 | 비티지의 근본, Diagol 개장</CardText>
-                    <CardText>Diagol의 피규어 팝업 스토어소식,</CardText>
-                    <CardText>오전 POP:ZIP 화이팅캠페인</CardText>
-                  </Card>
-                  <Card>
-                    <CardText>소식 | 마감 임박 Pop-up !</CardText>
-                    <CardText>세계 최고의 디자이너 Jackson,</CardText>
-                    <CardText>국내 유일 팝업스토어 D-1</CardText>
-                  </Card>
-                </Container>
-              </TouchableWithoutFeedback>
-            </ScrollView>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
-      <ScrollView>
-        <HomeItem
-          titleText="윤진원님을 위한 추천"
-          subText="ADERREROR X CONVERS"
-          imageUri="https://k.kakaocdn.net/dn/OgWSd/btsvoWU2HOn/TybFyU1PsqperlcIAOxZu0/img_640x640.jpg"
-        />
-        <HomeItem
-          titleText="최근 업데이트"
-          subText="Don't forget! Keep up the NEWS"
-          imageUri="https://k.kakaocdn.net/dn/OgWSd/btsvoWU2HOn/TybFyU1PsqperlcIAOxZu0/img_640x640.jpg"
-        />
-        <HomeItem
-          titleText="가장 인기"
-          subText="THE AVENGERS"
-          imageUri="https://k.kakaocdn.net/dn/OgWSd/btsvoWU2HOn/TybFyU1PsqperlcIAOxZu0/img_640x640.jpg"
-        />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {homePopups.map((popup, index) => (
+          <HomeItem
+            key={index}
+            handlePressImg={() => handlePressImg(popup)}
+            titleText={`${userName}님을 위한 추천`}
+            subText={popup.name}
+            imageUri={popup.image}
+          />
+        ))}
+        {todayStartPopups.map((popup, index) => (
+          <HomeItem
+            key={index}
+            handlePressImg={() => handlePressImg(popup)}
+            titleText="오늘 오픈 팝업"
+            subText={popup.name}
+            imageUri={popup.image}
+          />
+        ))}
+        {todayEndPopups.map((popup, index) => (
+          <HomeItem
+            key={index}
+            handlePressImg={() => handlePressImg(popup)}
+            titleText="오늘 마감 팝업"
+            subText={popup.name}
+            imageUri={popup.image}
+          />
+        ))}
       </ScrollView>
     </SafeAreaView>
   );

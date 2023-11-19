@@ -1,13 +1,17 @@
-import * as React from 'react';
+import React, {useEffect} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {useDispatch} from 'react-redux';
 
+import {fetchPopups} from '../redux/popups/popupSlice';
 import HomeScreen from '../screens/HomeScreen';
 import CategoryScreen from '../screens/CategoryScreen';
-import MapScreen from '../screens/MapScreen';
-import CalendarScreen from '../screens/CalendarScreen';
 import MyPageScreen from '../screens/MyPageScreen';
 
 function BottomTabNavigator() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchPopups());
+  }, []);
   const BottomTab = createBottomTabNavigator();
   return (
     <BottomTab.Navigator initialRouteName="Home">
@@ -20,16 +24,6 @@ function BottomTabNavigator() {
         options={{headerShown: false}}
         name="Category"
         component={CategoryScreen}
-      />
-      <BottomTab.Screen
-        options={{headerShown: false}}
-        name="Map"
-        component={MapScreen}
-      />
-      <BottomTab.Screen
-        options={{headerShown: false}}
-        name="Calendar"
-        component={CalendarScreen}
       />
       <BottomTab.Screen
         options={{headerShown: false}}

@@ -2,7 +2,7 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import axiosInstance from '../../axiosInstance';
+// import axiosInstance from '../../axiosInstance';
 
 export const getUserInfo = createAsyncThunk(
   'auth/getUserInfo',
@@ -10,8 +10,8 @@ export const getUserInfo = createAsyncThunk(
     try {
       const token = await AsyncStorage.getItem('token');
       const userId = await AsyncStorage.getItem('userId');
-      const response = await axiosInstance.get(
-        `http://localhost:8080/api/users/by-userid/${userId}`,
+      const response = await axios.get(
+        `http://localhost:8080/api/users/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -35,14 +35,15 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({username, password}, {rejectWithValue}) => {
     try {
-      const response = await axiosInstance.post(
-        'http://localhost:8080/api/auth/authenticate',
+      const response = await axios.post(
+        'http://localhost:8080/auth/authenticate',
         {
           userId: username,
           upassword: password,
         },
       );
       const token = response.data;
+      console.log('login response token: ', token);
 
       if (!token || token.error) {
         throw new Error('토큰 생성에 실패했습니다.');
@@ -64,7 +65,7 @@ export const loginUser = createAsyncThunk(
 export const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    user: null, // {id, userId, email, userName, role}
+    user: null, // {"email": "이메일", "id": null, "role": "ROLE_USER", "userId": "아이디", "userName": "이름"}
   },
   reducers: {
     setUser: (state, action) => {
@@ -77,7 +78,7 @@ export const authSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(getUserInfo.fulfilled, (state, action) => {
-        // getUserInfo 액션의 결과로 받아온 사용자 정보를 스토어에 저장 {id, userId, email, userName, role}
+        // getUserInfo 액션의 결과로 받아온 사용자 정보를 스토어에 저장 {"email": "이메일", "id": null, "role": "ROLE_USER", "userId": "아이디", "userName": "이름"}
         state.user = action.payload;
       })
       .addCase(getUserInfo.rejected, (state, action) => {

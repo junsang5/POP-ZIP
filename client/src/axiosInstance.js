@@ -10,7 +10,6 @@ mock.onGet('http://localhost:8080/api/users/by-userid/yjw').reply(200, {
     "userId": "yjw",
     "email": "loveyjw78@gmail.com",
     "userName": "yoonjinwon",
-    "role": "ROLE_USER"
 });
 mock.onPost('http://localhost:8080/api/auth/authenticate').reply(200, 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJvbnNvZ29uZyIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE3MDAzMjk2MzB9.xdP9E5P9hBDsikiJWadVKQqFnALiuEi-LTeEPqyM6N9eXkc8JxAqiBSp0Ibnfm5qM77_bK2RnRLa5aijqhYK8Q');
 mock.onPost('http://localhost:8080/api/signup').reply(200, {

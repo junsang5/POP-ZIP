@@ -1,9 +1,17 @@
-import React, {useState} from 'react';
-import {View, Text, FlatList, TouchableOpacity, Modal, SafeAreaView} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Modal,
+  SafeAreaView,
+} from 'react-native';
 import PopUpStoreSummaryComponent from '../components/PopUpStoreSummaryComponent';
 import CategoryFilterModal from '../components/CategoryFilterModal';
 import SearchBar from '../components/SearchBar';
 import styled from '@emotion/native';
+import {useSelector} from 'react-redux';
 
 const Container = styled.SafeAreaView`
   flex: 1;
@@ -25,42 +33,58 @@ const FilterButton = styled.TouchableOpacity`
 
 const CategoryScreen = ({navigation}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [filter, setFilter] = useState({category: []});
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [filteredPopUpStores, setFilteredPopUpStores] = useState([]);
+
+  const popUpStores = useSelector(state => state.popups);
+
+  useEffect(() => {
+    console.log('popUpStores', popUpStores);
+    console.log('selectedCategories: ', selectedCategories);
+    if (selectedCategories.length > 0) {
+      const filteredStores = popUpStores.filter(store =>
+        selectedCategories.includes(store.category),
+      );
+      setFilteredPopUpStores(filteredStores);
+    } else {
+      setFilteredPopUpStores(popUpStores);
+    }
+  }, [selectedCategories, popUpStores]);
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
   };
 
-  const popUpStores = [
-    {id: 1, name: 'AA'},
-    {id: 2, name: 'BB'},
-    {id: 3, name: 'CC'},
-    {id: 4, name: 'DD'},
-  ];
+  const handlePressStore = () => {
+    navigation.navigate('Store');
+  };
 
   const renderPopUpStore = ({item}) => (
-    <PopUpStoreSummaryComponent data={item} />
+    <PopUpStoreSummaryComponent onPress={handlePressStore} data={item} />
   );
 
   return (
     <Container>
       <SearchBar prevScreen={'Category'} />
       <List
-        data={popUpStores}
+        data={filteredPopUpStores}
         renderItem={renderPopUpStore}
-        keyExtractor={item => item.name}
+        keyExtractor={item => item.id.toString()}
+        showsVerticalScrollIndicator={false}
       />
-
       <FilterButton onPress={toggleModal}>
         <Text>필터</Text>
       </FilterButton>
-
       <Modal
         animationType="slide"
-        transparent={false}
+        transparent={true}
         visible={isModalVisible}
         onRequestClose={toggleModal}>
-        <CategoryFilterModal setFilter={setFilter} closeModal={toggleModal} />
+        <CategoryFilterModal
+          selectedCategories={selectedCategories}
+          setFilter={setSelectedCategories}
+          closeModal={toggleModal}
+        />
       </Modal>
     </Container>
   );

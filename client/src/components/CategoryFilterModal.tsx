@@ -2,14 +2,35 @@ import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, SafeAreaView} from 'react-native';
 import styled from '@emotion/native';
 
+const ModalContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5); // Semi-transparent background
+`;
+
+const ModalContent = styled.View`
+  width: 90%;
+  height: auto; // Fixed height for the modal content
+  background-color: white;
+  border-radius: 20px;
+  padding: 20px;
+  justify-content: center;
+  align-items: center;
+`;
+
 const FilterButton = styled.TouchableOpacity`
   background-color: ${props => (props.selected ? '#ddd' : 'white')};
   border-radius: 5px;
-  margin-top: 10;
+  margin: 10px;
+  padding: 10px;
+  width: 80%; // Make buttons wider
+  align-items: center; // Center text in the button
 `;
 
-const CategoryFilterModal = ({setFilter, closeModal}) => {
-  const [selectedList, setSelectedList] = useState([]);
+const CategoryFilterModal = ({selectedCategories, setFilter, closeModal}) => {
+  const [selectedList, setSelectedList] = useState(selectedCategories);
+
   const categories = [
     'street',
     'contemporary',
@@ -33,19 +54,21 @@ const CategoryFilterModal = ({setFilter, closeModal}) => {
   };
 
   return (
-    <SafeAreaView>
-      {categories.map(category => (
-        <FilterButton
-          key={category}
-          selected={selectedList.includes(category)}
-          onPress={() => handleSetFilter(category)}>
-          <Text>{category}</Text>
-        </FilterButton>
-      ))}
-      <TouchableOpacity onPress={handleFinishSelection}>
-        <Text>완료</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
+    <ModalContainer>
+      <ModalContent>
+        {categories.map(category => (
+          <FilterButton
+            key={category}
+            selected={selectedList.includes(category)}
+            onPress={() => handleSetFilter(category)}>
+            <Text>{category}</Text>
+          </FilterButton>
+        ))}
+        <TouchableOpacity onPress={handleFinishSelection}>
+          <Text>완료</Text>
+        </TouchableOpacity>
+      </ModalContent>
+    </ModalContainer>
   );
 };
 
