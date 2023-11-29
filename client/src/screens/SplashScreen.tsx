@@ -1,12 +1,12 @@
 import React from 'react';
 import SplashContainer from '../containers/auth/SplashContainer';
-import {View} from 'react-native';
+import {SafeAreaView} from 'react-native';
 
 function SplashScreen({navigation}) {
   return (
-    <View>
+    <SafeAreaView>
       <SplashContainer navigation={navigation} />
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -64,10 +64,10 @@ function SignUpScreen({navigation, route}) {
   const onSubmit = useCallback(async () => {
     try {
       console.log(id, name, email, password, passwordRe);
-      const response = await axios.post('http://localhost:8080/api/signup', {
-        userId: id,
-        userName: name,
-        upassword: password,
+      const response = await axios.post('http://localhost:8080/user/signup', {
+        userid: id,
+        username: name,
+        password: password,
         email: email,
       });
       console.log('signup response: ', response.data); //{"crateDate": "2023-11-19T08:08:01.212+00:00", "email": "1", "id": 2, "role": "ROLE_USER", "status": null, "token": null, "upassword": "$2a$10$L97snDYl1CHNJNfILMQnvuAuMRe0YeQ6MFLBWM/SO8yc99oK9U31i", "updateDate": "2023-11-19T08:08:01.212+00:00", "userId": "111", "userName": "1"}

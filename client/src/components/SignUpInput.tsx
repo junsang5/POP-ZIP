@@ -10,19 +10,13 @@ type Props = {
   secureTextEntry?: boolean;
 };
 
-const CustomTextInput = styled.TextInput`
-  border-radius: 37px;
-  background: rgba(118, 158, 188, 0.3);
-  height: 56px;
-  width: 310px;
-  text-align: center;
-  color: #000;
-  font-family: ${Platform.OS === 'ios'
-    ? 'NanumSquare Neo OTF'
-    : 'NanumSquareNeoOTF-Rg'};
-  font-size: 13px;
-  font-style: normal;
-  font-weight: 400;
+const SInput = styled.TextInput`
+  background-color: #fff; // 입력창 배경색
+  border: 1px solid #ddd; // 경계선 스타일
+  border-radius: 8px; // 입력창 모서리 둥글게
+  width: 90%; // 너비 설정
+  padding: 15px; // 내부 패딩
+  margin-vertical: 10px; // 수직 마진
 `;
 
 const SignUpInput: FC<Props> = ({
@@ -33,13 +27,12 @@ const SignUpInput: FC<Props> = ({
   onChangeText,
 }) => {
   return (
-    <CustomTextInput
+    <SInput
       onChangeText={onChangeText}
       value={value}
       placeholder={placeholder}
       secureTextEntry={secureTextEntry}
       style={style}
-      placeholderTextColor={'#fff'}
     />
   );
 };

@@ -7,15 +7,17 @@ export const fetchPopups = createAsyncThunk(
   async (_, {rejectWithValue}) => {
     try {
       const token = await AsyncStorage.getItem('token');
+      console.log('[fetchPopups] Storage token: ', token);
       const response = await axios.get('http://localhost:8080/popup/list', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      },);
-      console.log('fetch popups:', response.data);
+      });
+      console.log('fetch popup success!! popups: ', response.data);
       return response.data;
     } catch (error) {
       console.log('fetch popups error: ', error);
+      console.log(error.response.status);
       return rejectWithValue(error.message);
     }
   },

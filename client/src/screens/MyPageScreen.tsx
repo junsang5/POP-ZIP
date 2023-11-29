@@ -2,6 +2,10 @@ import * as React from 'react';
 import {Linking, Alert, SafeAreaView, View} from 'react-native';
 import styled from 'styled-components/native';
 import {useNavigation} from '@react-navigation/native';
+import {useSelector, useDispatch} from 'react-redux';
+import {clearUser} from '../redux/auth/authSlice';
+import {clearIsLoggedIn} from '../redux/auth/authSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileContainer = styled.View`
   background-color: #ffffff;
@@ -38,21 +42,21 @@ const UserId = styled.Text`
   padding: 0px 2px;
 `;
 
-const UserType = styled.Text`
+const UserEmail = styled.Text`
   font-size: 16px;
   color: #555;
   padding: 0px 2px;
 `;
 
 // 프로필 카드 컴포넌트
-const UserProfileCard = ({imageUrl, userName, userId, userType}) => {
+const UserProfileCard = ({imageUrl, userName, userId, userEmail}) => {
   return (
     <ProfileContainer>
-      <ProfileImage source={{uri: imageUrl}} />
+      <ProfileImage source={imageUrl} />
       <UserInfo>
         <UserName>{userName}</UserName>
-        <UserId>{userId}</UserId>
-        <UserType>{userType}</UserType>
+        <UserId>Id: {userId}</UserId>
+        <UserEmail>Email: {userEmail}</UserEmail>
       </UserInfo>
     </ProfileContainer>
   );
@@ -81,58 +85,54 @@ const MenuText = styled.Text`
 
 function MyPageScreen() {
   const navigation = useNavigation();
-
-  // 회원정보 수정 스크린으로 라우팅 함수
-  const handleEditProfile = () => {
-    navigation.navigate('ProfileChange');
-    console.log('move to profilechange');
-  };
+  const dispatch = useDispatch();
+  const user = useSelector(state => state.auth.user);
 
   // 로그아웃 함수
   const handleLogout = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
       {text: 'Cancel', style: 'cancel'},
-      {text: 'Yes', onPress: () => console.log('Logged Out')}, // 로그아웃 처리 로직 구현
-    ]);
-  };
-
-  const handleDeleteAccount = () => {
-    // 회원 탈퇴 로직 구현
-    Alert.alert('Delete Account', 'Do you want to delete your account?', [
-      {text: 'Cancel', style: 'cancel'},
       {
-        text: 'OK',
-        onPress: () => {
-          console.log('Account Deleted');
-          navigation.navigate('Home');
+        text: 'Yes',
+        onPress: async () => {
+          await AsyncStorage.removeItem('token');
+          await AsyncStorage.removeItem('userid');
+          dispatch(clearUser());
+          dispatch(clearIsLoggedIn());
+          console.log('Logged Out');
+          navigation.navigate('SignIn');
         },
       },
     ]);
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <View>
-        <UserProfileCard
-          imageUrl="https://k.kakaocdn.net/dn/OgWSd/btsvoWU2HOn/TybFyU1PsqperlcIAOxZu0/img_640x640.jpg"
-          userName="김효원"
-          userId="kev_hy1042"
-          userType="스트릿 매니아"
-        />
-      </View>
-
-      <MenuContainer>
-        <MenuItem onPress={handleEditProfile}>
-          <MenuText>회원정보 수정</MenuText>
-        </MenuItem>
-        <MenuItem onPress={handleLogout}>
-          <MenuText>로그아웃</MenuText>
-        </MenuItem>
-        <MenuItem onPress={handleDeleteAccount}>
-          <MenuText>탈퇴</MenuText>
-        </MenuItem>
-      </MenuContainer>
-    </SafeAreaView>
+    <>
+      {user && (
+        <SafeAreaView style={{flex: 1}}>
+          <View>
+            <UserProfileCard
+              imageUrl={require('../assets/images/person.png')}
+              userName={`${user.username}`}
+              userId={`${user.userid}`}
+              userEmail={`${user.email}`}
+            />
+          </View>
+          <MenuContainer>
+            <MenuItem onPress={handleLogout}>
+              <MenuText>로그아웃</MenuText>
+            </MenuItem>
+          </MenuContainer>
+        </SafeAreaView>
+      )}
+      {!user && (
+        <MenuContainer>
+          <MenuItem onPress={handleLogout}>
+            <MenuText>로그아웃</MenuText>
+          </MenuItem>
+        </MenuContainer>
+      )}
+    </>
   );
 }
 

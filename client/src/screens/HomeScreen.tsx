@@ -1,93 +1,67 @@
 import React, {useState, useEffect} from 'react';
 import {
-  View,
-  Text,
-  Image,
   ScrollView,
   SafeAreaView,
-  Modal,
   Pressable,
-  TouchableWithoutFeedback,
+  Dimensions,
+  Image,
+  Text,
+  View,
 } from 'react-native';
-import styled from 'styled-components/native';
+import styled from '@emotion/native';
 import {useSelector} from 'react-redux';
 
-const Header = styled(View)`
+const Header = styled.View`
   flex-direction: row;
   justify-content: space-between;
-  padding: 20px;
+  margin: 10px 0 10px 0;
 `;
 
-const EmptyView = styled(View)`
-  width: 50px;
+const Logo = styled.Image`
+  margin: 0 auto;
+  width: 100px;
+  aspect-ratio: 1.4/1;
 `;
 
-const TouchIcon = styled(TouchableWithoutFeedback)`
-  width: 50px;
-`;
-
-const Icon = styled(Image)`
-  width: 50px;
-  height: 50px;
-`;
-
-const Column = styled.View`
-  flex-direction: Column;
-  padding: 5px;
-`;
-
-const HomeImage = styled(Image)`
-  width: 100%;
-  height: 300px;
-  margin-vertical: 10px;
-`;
-
-const HomeTitle = styled(Text)`
+const HomeTitle = styled.Text`
   font-size: 25px;
-  font-weight: bold;
+  font-weight: 900;
+  margin-left: 20px;
   text-align: center;
+  color: #2b4454; // 제목 색상 업데이트
 `;
 
-const HomeSubTitle = styled(Text)`
-  font-size: 18px;
+const SlideContainer = styled.ScrollView`
+  width: 340px;
+  height: 300px;
+  margin: 5px auto 20px auto;
+`;
+
+const HomeItemContainer = styled.Pressable`
+  display: flex;
+  overflow: hidden;
+  width: 340px;
+  height: 300px;
+  align-items: center;
+  justify-content: center;
+`;
+
+const HomeImage = styled.Image`
+  width: 340px;
+  height: 260px;
+  border-radius: 12px;
+`;
+
+const HomeSubTitle = styled.Text`
+  font-size: 16px;
+  font-weight: 600;
   text-align: center;
-  color: grey;
+  margin-top: 5px;
+  color: black;
 `;
 
-const HomeItem = ({handlePressImg, titleText, subText, imageUri}) => {
-  // subText = {팝업스토어 title}, imageUri = {팝업스토어 img}
-  return (
-    <Column>
-      <HomeTitle>{titleText}</HomeTitle>
-      <HomeSubTitle>{subText}</HomeSubTitle>
-      <Pressable onPress={handlePressImg}>
-        <HomeImage source={{uri: imageUri}} />
-      </Pressable>
-    </Column>
-  );
-};
-
-// 카드 스타일 컴포넌트
-const Card = styled.View`
-  background-color: #80bfff;
-  border-radius: 8px;
-  padding: 30px;
-  margin: 8px;
-`;
-
-// 텍스트 스타일 컴포넌트
-const CardText = styled.Text`
-  color: #004c8c;
-  font-size: 18px;
-  margin-bottom: 8px;
-`;
-
-// 전체 컨테이너
 const Container = styled.View`
-  flex: 1;
-  padding: 0px;
-  background-color: #f0f8ff;
-  background-color: rgba(240, 248, 255, 0.3);
+  margin-bottom: 200px;
 `;
 
 const getCurrentDate = () => {
@@ -101,30 +75,43 @@ const getCurrentDate = () => {
   return formattedDate;
 };
 
+const HomeItem = ({onPress, popup}) => {
+  const [imageLoadSuccess, setImageLoadSuccess] = useState(true);
+  const fallbackImage = require('../assets/images/popzip_main.png');
+  return (
+    <HomeItemContainer onPress={() => onPress(popup)}>
+      <HomeImage
+        source={imageLoadSuccess ? {uri: popup.imageurl} : fallbackImage}
+        onError={() => setImageLoadSuccess(false)}
+        resizeMode={imageLoadSuccess ? 'cover' : 'contain'}
+      />
+      <HomeSubTitle>{popup.name}</HomeSubTitle>
+    </HomeItemContainer>
+  );
+};
+
 const HomeScreen = ({navigation}) => {
   const [homePopups, setHomePopups] = useState([]);
   const [todayStartPopups, setTodayStartPopups] = useState([]);
   const [todayEndPopups, setTodayEndPopups] = useState([]);
 
   const popUpStores = useSelector(state => state.popups);
-  const userName = useSelector(state => state.auth.user.userName);
+  const user = useSelector(state => state.auth.user);
 
   useEffect(() => {
     const currentDate = getCurrentDate();
 
     // view_home이 true인 팝업스토어만 필터링
-    const filteredHomePopups = popUpStores
-      .filter(popup => popup.viewHome === true)
-      .slice(0, 3); // 최대 3개
+    const filteredHomePopups = popUpStores.filter(popup => popup).slice(0, 3); // 최대 3개
 
     // start_date가 오늘인 팝업스토어만 필터링
     const filteredTodayStartPopups = popUpStores
-      .filter(popup => popup.startDate === currentDate)
+      .filter(popup => popup.start_date === currentDate)
       .slice(0, 3); // 최대 3개
 
     // end_date가 오늘인 팝업스토어만 필터링
     const filteredTodayEndPopups = popUpStores
-      .filter(popup => popup.endDate === currentDate)
+      .filter(popup => popup.end_date === currentDate)
       .slice(0, 3); // 최대 3개
 
     setHomePopups(filteredHomePopups);
@@ -135,45 +122,69 @@ const HomeScreen = ({navigation}) => {
   const handlePressImg = store => {
     navigation.navigate('Store', {popup: store});
   };
+  const logoPath = require('../assets/images/pop_logo.png');
   return (
     <SafeAreaView>
-      <Header>
-        <EmptyView />
-        <Icon
-          source={{
-            uri: 'https://k.kakaocdn.net/dn/OgWSd/btsvoWU2HOn/TybFyU1PsqperlcIAOxZu0/img_640x640.jpg',
-          }}
-        />
-      </Header>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {homePopups.map((popup, index) => (
-          <HomeItem
-            key={index}
-            handlePressImg={() => handlePressImg(popup)}
-            titleText={`${userName}님을 위한 추천`}
-            subText={popup.name}
-            imageUri={popup.image}
-          />
-        ))}
-        {todayStartPopups.map((popup, index) => (
-          <HomeItem
-            key={index}
-            handlePressImg={() => handlePressImg(popup)}
-            titleText="오늘 오픈 팝업"
-            subText={popup.name}
-            imageUri={popup.image}
-          />
-        ))}
-        {todayEndPopups.map((popup, index) => (
-          <HomeItem
-            key={index}
-            handlePressImg={() => handlePressImg(popup)}
-            titleText="오늘 마감 팝업"
-            subText={popup.name}
-            imageUri={popup.image}
-          />
-        ))}
-      </ScrollView>
+      {user && (
+        <Container>
+          <Header>
+            <Logo source={logoPath} />
+          </Header>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {homePopups.length > 0 && (
+              <>
+                <HomeTitle>{`${user.username}님을 위한 추천`}</HomeTitle>
+                <SlideContainer
+                  horizontal
+                  pagingEnabled
+                  showsHorizontalScrollIndicator={false}>
+                  {homePopups.map((popup, index) => (
+                    <HomeItem
+                      key={index}
+                      onPress={handlePressImg}
+                      popup={popup}
+                    />
+                  ))}
+                </SlideContainer>
+              </>
+            )}
+            {todayStartPopups.length > 0 && (
+              <>
+                <HomeTitle>오늘 오픈 팝업</HomeTitle>
+                <SlideContainer
+                  horizontal
+                  pagingEnabled
+                  showsHorizontalScrollIndicator={false}>
+                  {todayStartPopups.map((popup, index) => (
+                    <HomeItem
+                      key={index}
+                      onPress={handlePressImg}
+                      popup={popup}
+                    />
+                  ))}
+                </SlideContainer>
+              </>
+            )}
+            {todayEndPopups.length > 0 && (
+              <>
+                <HomeTitle>오늘 마감 팝업</HomeTitle>
+                <SlideContainer
+                  horizontal
+                  pagingEnabled
+                  showsHorizontalScrollIndicator={false}>
+                  {todayEndPopups.map((popup, index) => (
+                    <HomeItem
+                      key={index}
+                      onPress={handlePressImg}
+                      popup={popup}
+                    />
+                  ))}
+                </SlideContainer>
+              </>
+            )}
+          </ScrollView>
+        </Container>
+      )}
     </SafeAreaView>
   );
 };

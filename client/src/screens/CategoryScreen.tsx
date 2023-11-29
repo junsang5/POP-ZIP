@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   Modal,
   SafeAreaView,
+  Pressable,
 } from 'react-native';
 import PopUpStoreSummaryComponent from '../components/PopUpStoreSummaryComponent';
 import CategoryFilterModal from '../components/CategoryFilterModal';
-import SearchBar from '../components/SearchBar';
 import styled from '@emotion/native';
 import {useSelector} from 'react-redux';
 
@@ -24,11 +24,19 @@ const List = styled.FlatList``;
 
 const FilterButton = styled.TouchableOpacity`
   position: absolute;
+  background-color: #2b4454;
   bottom: 10px;
-  left: 0;
-  right: 0;
+  padding: 6px;
+  border-radius: 8px;
   justify-content: center;
   align-items: center;
+  width: 40%;
+  height: 30px;
+`;
+const FilterText = styled.Text`
+  color: #fff; // 텍스트 색상
+  font-size: 12px; // 폰트 크기
+  font-weight: 700; // 폰트 두께
 `;
 
 const CategoryScreen = ({navigation}) => {
@@ -39,8 +47,8 @@ const CategoryScreen = ({navigation}) => {
   const popUpStores = useSelector(state => state.popups);
 
   useEffect(() => {
-    console.log('popUpStores', popUpStores);
-    console.log('selectedCategories: ', selectedCategories);
+    // console.log('popUpStores', popUpStores);
+    console.log('(CategoryScreen)selectedCategories: ', selectedCategories);
     if (selectedCategories.length > 0) {
       const filteredStores = popUpStores.filter(store =>
         selectedCategories.includes(store.category),
@@ -55,17 +63,19 @@ const CategoryScreen = ({navigation}) => {
     setIsModalVisible(!isModalVisible);
   };
 
-  const handlePressStore = () => {
-    navigation.navigate('Store');
+  const handlePressStore = store => {
+    navigation.navigate('Store', {popup: store});
   };
 
   const renderPopUpStore = ({item}) => (
-    <PopUpStoreSummaryComponent onPress={handlePressStore} data={item} />
+    <PopUpStoreSummaryComponent
+      onPress={() => handlePressStore(item)}
+      data={item}
+    />
   );
 
   return (
     <Container>
-      <SearchBar prevScreen={'Category'} />
       <List
         data={filteredPopUpStores}
         renderItem={renderPopUpStore}
@@ -73,7 +83,7 @@ const CategoryScreen = ({navigation}) => {
         showsVerticalScrollIndicator={false}
       />
       <FilterButton onPress={toggleModal}>
-        <Text>필터</Text>
+        <FilterText>필터</FilterText>
       </FilterButton>
       <Modal
         animationType="slide"

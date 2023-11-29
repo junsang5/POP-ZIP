@@ -20,12 +20,29 @@ const ModalContent = styled.View`
 `;
 
 const FilterButton = styled.TouchableOpacity`
-  background-color: ${props => (props.selected ? '#ddd' : 'white')};
+  background-color: ${props => (props.selected ? '#EDF7FF' : 'white')};
   border-radius: 5px;
+  border: ${props => (props.selected ? '#34A1DC' : '#9E9E9E')};
   margin: 10px;
   padding: 10px;
   width: 80%; // Make buttons wider
   align-items: center; // Center text in the button
+`;
+
+const FilterText = styled.Text`
+  color: ${props => (props.selected ? '#2B4454' : 'black')};
+`;
+
+const FinishButton = styled.TouchableOpacity`
+  background-color: #7DC3E9;
+  border-radius: 12px;
+  margin: 20px;
+  padding: 10px;
+  width: 40%;
+  align-items: center; // Center text in the button
+`;
+const FinishText= styled.Text`
+  color: white;
 `;
 
 const CategoryFilterModal = ({selectedCategories, setFilter, closeModal}) => {
@@ -61,12 +78,14 @@ const CategoryFilterModal = ({selectedCategories, setFilter, closeModal}) => {
             key={category}
             selected={selectedList.includes(category)}
             onPress={() => handleSetFilter(category)}>
-            <Text>{category}</Text>
+            <FilterText selected={selectedList.includes(category)}>
+              {category}
+            </FilterText>
           </FilterButton>
         ))}
-        <TouchableOpacity onPress={handleFinishSelection}>
-          <Text>완료</Text>
-        </TouchableOpacity>
+        <FinishButton onPress={handleFinishSelection}>
+          <FinishText>완료</FinishText>
+        </FinishButton>
       </ModalContent>
     </ModalContainer>
   );

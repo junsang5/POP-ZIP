@@ -9,23 +9,22 @@ export const getUserInfo = createAsyncThunk(
   async (_, {rejectWithValue}) => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const userId = await AsyncStorage.getItem('userId');
-      const response = await axios.get(
-        `http://localhost:8080/api/users/${userId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const userid = await AsyncStorage.getItem('userid');
+      const response = await axios.get(`http://localhost:8080/user/${userid}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
-      if (!token || !userId) {
-        return rejectWithValue('getUserInfo: No user data found');
+      });
+      if (!token || !userid) {
+        return rejectWithValue(
+          'getUserInfo: No user data found (in AsyncStorage)',
+        );
       }
-      console.log('AsyncStorage(getUserInfo) user: ', response.data);
-
+      console.log('[getUserInfo] response user: ', response.data);
+      console.log('[getUserInfo] finish!! response success!!');
       return response.data; // {id, userId, email, userName, role}
     } catch (error) {
-      console.error('getUSerInfo:',error);
+      console.error('getUserInfo:', error);
       return rejectWithValue(error.message);
     }
   },
@@ -33,30 +32,31 @@ export const getUserInfo = createAsyncThunk(
 
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
-  async ({username, password}, {rejectWithValue}) => {
+  async ({userid, password}, {rejectWithValue}) => {
     try {
       const response = await axios.post(
         'http://localhost:8080/auth/authenticate',
         {
-          userId: username,
-          upassword: password,
+          userid: userid,
+          password: password,
         },
       );
-      const token = response.data;
-      console.log('login response token: ', token);
+      const res = response.data;
+      const user = res.user;
+      const token = res.token;
+      console.log('[loginUser] response user: ', res.user);
+      console.log('[loginUser] response token: ', res.token);
 
-      if (!token || token.error) {
-        throw new Error('토큰 생성에 실패했습니다.');
+      if (!res || res.error) {
+        throw new Error('로그인에 실패했습니다.');
       }
 
       await AsyncStorage.setItem('token', token);
-      await AsyncStorage.setItem('userId', username);
-      console.log('AsyncStorage(loginUser) token: ', token);
-      console.log('AsyncStorage(loginUser) userId: ', username);
-
-      return token;
+      console.log('[loginUser] Storage token: ', token);
+      console.log('[loginUser] finish!! response success!!');
+      return {user, token};
     } catch (error) {
-      console.error('loginUser:',error);
+      console.error('loginUser:', error);
       return rejectWithValue(error.message);
     }
   },
@@ -66,6 +66,7 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState: {
     user: null, // {"email": "이메일", "id": null, "role": "ROLE_USER", "userId": "아이디", "userName": "이름"}
+    isLoggedIn: false,
   },
   reducers: {
     setUser: (state, action) => {
@@ -74,9 +75,22 @@ export const authSlice = createSlice({
     clearUser: state => {
       state.user = null;
     },
+    setIsLoggedIn: state => {
+      state.isLoggedIn = true;
+    },
+    clearIsLoggedIn: state => {
+      state.isLoggedIn = false;
+    },
   },
   extraReducers: builder => {
     builder
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.isLoggedIn = true;
+        state.user = action.payload.user;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.isLoggedIn = false;
+      })
       .addCase(getUserInfo.fulfilled, (state, action) => {
         // getUserInfo 액션의 결과로 받아온 사용자 정보를 스토어에 저장 {"email": "이메일", "id": null, "role": "ROLE_USER", "userId": "아이디", "userName": "이름"}
         state.user = action.payload;
@@ -87,5 +101,6 @@ export const authSlice = createSlice({
   },
 });
 
-export const {setUser, clearUser} = authSlice.actions;
+export const {setUser, clearUser, setIsLoggedIn, clearIsLoggedIn} =
+  authSlice.actions;
 export default authSlice.reducer;
